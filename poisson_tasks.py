@@ -126,10 +126,10 @@ class SeamlessCloningSolver(object):
         if (not m_grad):
             self.v_R_h = self.grad_source_R_h
             self.v_R_w = self.grad_source_R_w
-            self.v_G_h = self.grad_source_R_h
-            self.v_G_w = self.grad_source_R_w
-            self.v_B_h = self.grad_source_R_h
-            self.v_B_w = self.grad_source_R_w
+            self.v_G_h = self.grad_source_G_h
+            self.v_G_w = self.grad_source_G_w
+            self.v_B_h = self.grad_source_B_h
+            self.v_B_w = self.grad_source_B_w
         else:
             self.v_R_h = self.mix_grad(self.grad_source_R_h, self.grad_target_R_h)
             self.v_R_w = self.mix_grad(self.grad_source_R_w, self.grad_target_R_w)
@@ -464,12 +464,12 @@ class ColorChangeSolver(object):
         self.grad_target_B_w = self.grad(self.target_B, self.height, self.width, "w")
 
         '''Generate the guiding vector field'''
-        self.v_R_h = self.grad_source_R_h
-        self.v_R_w = self.grad_source_R_w
-        self.v_G_h = self.grad_source_R_h
-        self.v_G_w = self.grad_source_R_w
-        self.v_B_h = self.grad_source_R_h
-        self.v_B_w = self.grad_source_R_w
+        self.v_R_h = self.grad_source_R_h * R_mul
+        self.v_R_w = self.grad_source_R_w * R_mul
+        self.v_G_h = self.grad_source_G_h * G_mul
+        self.v_G_w = self.grad_source_G_w * G_mul
+        self.v_B_h = self.grad_source_B_h * B_mul
+        self.v_B_w = self.grad_source_B_w * B_mul
 
         # '''TT: Generate the guiding vector field'''
         # self.v_R_h_f = self.grad_target_R_h
@@ -489,8 +489,7 @@ class ColorChangeSolver(object):
         for i in range(self.height):
             for j in range(self.width):
                 if (self.mask[i,j] >= 1):
-                    # source_ret[i,j] = self.target[i,j] * RGB_mul
-                    source_ret[i,j] = np.array([0, 255, 0], dtype=float) * RGB_mul
+                    source_ret[i,j] = self.target[i,j] * RGB_mul
         # cv2.imwrite("source_cc.jpg", source_ret.astype(np.uint8))
         return source_ret
 
