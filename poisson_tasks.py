@@ -1,6 +1,7 @@
 import argparse
 import cv2
 import numpy as np
+import time
 from numpy.linalg import *
 
 class GuidedInterpolationSolver(object):
@@ -58,8 +59,6 @@ class GuidedInterpolationSolver(object):
                     
                     N[(int)(self.mask[i,j]) - 1, 0] = s
         assert(n_checked == self.mask_numpt), "Not all mask points checked"
-        # M = M + 1e-6 * np.eye(self.mask_numpt, dtype=int)
-        # print(np.linalg.det(M))
         ans = np.linalg.solve(M, N)
         output = np.array(self.target, copy=True)
         for i in range(1, self.height-1):
@@ -183,6 +182,7 @@ class SeamlessCloningSolver(object):
     
     def solve(self):
         print("Start solving seamless cloning question")
+        start_time = time.time()
         assert(isinstance(self.v_R_h, np.ndarray)), "v_R_h not a ndarray"
         assert(isinstance(self.v_R_w, np.ndarray)), "v_R_w not a ndarray"
         assert(isinstance(self.v_G_h, np.ndarray)), "v_G_h not a ndarray"
@@ -205,7 +205,8 @@ class SeamlessCloningSolver(object):
         G_output = G_solver.solve()
         print("Start solving GuidedInterpolationSolver subquestion for B channel")
         B_output = B_solver.solve()
-        print("Solving Finished")
+        end_time = time.time()
+        print(f"Solving Finished, spend time: {end_time - start_time}")
         return np.stack((R_output, G_output, B_output), axis = 2)
 
 class TextureFlatteningSolver(object):
@@ -295,7 +296,8 @@ class TextureFlatteningSolver(object):
         self.mask_numpt = mask_numpt
     
     def solve(self):
-        print("Start solving selection editing question")
+        print("Start solving texture flattening question")
+        start_time = time.time()
         assert(isinstance(self.v_R_h, np.ndarray)), "v_R_h not a ndarray"
         assert(isinstance(self.v_R_w, np.ndarray)), "v_R_w not a ndarray"
         assert(isinstance(self.v_G_h, np.ndarray)), "v_G_h not a ndarray"
@@ -306,13 +308,14 @@ class TextureFlatteningSolver(object):
         R_solver = GuidedInterpolationSolver(self.source_R, self.mask, self.mask_numpt, self.v_R_h, self.v_R_w, self.height, self.width)
         G_solver = GuidedInterpolationSolver(self.source_G, self.mask, self.mask_numpt, self.v_G_h, self.v_G_w, self.height, self.width)
         B_solver = GuidedInterpolationSolver(self.source_B, self.mask, self.mask_numpt, self.v_B_h, self.v_B_w, self.height, self.width)
-        print("Start solving TextureFlatteningSolver subquestion for R channel")
+        print("Start solving GuidedInterpolationSolver subquestion for R channel")
         R_output = R_solver.solve()
-        print("Start solving TextureFlatteningSolver subquestion for G channel")
+        print("Start solving GuidedInterpolationSolver subquestion for G channel")
         G_output = G_solver.solve()
-        print("Start solving TextureFlatteningSolver subquestion for B channel")
+        print("Start solving GuidedInterpolationSolversubquestion for B channel")
         B_output = B_solver.solve()
-        print("Solving Finished")
+        end_time = time.time()
+        print(f"Solving Finished, spend time: {end_time - start_time}")
         return np.stack((R_output, G_output, B_output), axis = 2)
 
 class IlluminationChangeSolver(object):
@@ -398,7 +401,8 @@ class IlluminationChangeSolver(object):
             return np.array([])
         
     def solve(self):
-        print("Start solving selection editing question")
+        print("Start solving local illumination change question")
+        start_time = time.time()
         assert(isinstance(self.v_R_h, np.ndarray)), "v_R_h not a ndarray"
         assert(isinstance(self.v_R_w, np.ndarray)), "v_R_w not a ndarray"
         assert(isinstance(self.v_G_h, np.ndarray)), "v_G_h not a ndarray"
@@ -409,13 +413,14 @@ class IlluminationChangeSolver(object):
         R_solver = GuidedInterpolationSolver(self.source_R, self.mask, self.mask_numpt, self.v_R_h, self.v_R_w, self.height, self.width)
         G_solver = GuidedInterpolationSolver(self.source_G, self.mask, self.mask_numpt, self.v_G_h, self.v_G_w, self.height, self.width)
         B_solver = GuidedInterpolationSolver(self.source_B, self.mask, self.mask_numpt, self.v_B_h, self.v_B_w, self.height, self.width)
-        print("Start solving IlluminationChangeSolver subquestion for R channel")
+        print("Start solving GuidedInterpolationSolver subquestion for R channel")
         R_output = R_solver.solve()
-        print("Start solving IlluminationChangeSolver subquestion for G channel")
+        print("Start solving GuidedInterpolationSolver subquestion for G channel")
         G_output = G_solver.solve()
-        print("Start solving IlluminationChangeSolver subquestion for B channel")
+        print("Start solving GuidedInterpolationSolver subquestion for B channel")
         B_output = B_solver.solve()
-        print("Solving Finished")
+        end_time = time.time()
+        print(f"Solving Finished, spend time: {end_time - start_time}")
         return np.stack((R_output, G_output, B_output), axis = 2)
 
 class ColorChangeSolver(object):
@@ -527,7 +532,8 @@ class ColorChangeSolver(object):
             return np.array([])
         
     def solve(self):
-        print("Start selection editing cloning question")
+        print("Start local color change question")
+        start_time = time.time()
         assert(isinstance(self.v_R_h, np.ndarray)), "v_R_h not a ndarray"
         assert(isinstance(self.v_R_w, np.ndarray)), "v_R_w not a ndarray"
         assert(isinstance(self.v_G_h, np.ndarray)), "v_G_h not a ndarray"
@@ -538,14 +544,126 @@ class ColorChangeSolver(object):
         R_solver = GuidedInterpolationSolver(self.target_R, self.mask, self.mask_numpt, self.v_R_h, self.v_R_w, self.height, self.width)
         G_solver = GuidedInterpolationSolver(self.target_G, self.mask, self.mask_numpt, self.v_G_h, self.v_G_w, self.height, self.width)
         B_solver = GuidedInterpolationSolver(self.target_B, self.mask, self.mask_numpt, self.v_B_h, self.v_B_w, self.height, self.width)
-        print("Start solving ColorChange subquestion for R channel")
+        print("Start solving GuidedInterpolationSolver subquestion for R channel")
         R_output = R_solver.solve()
-        print("Start solving ColorChange subquestion for G channel")
+        print("Start solving GuidedInterpolationSolver subquestion for G channel")
         G_output = G_solver.solve()
-        print("Start solving ColorChange subquestion for B channel")
+        print("Start solving GuidedInterpolationSolver subquestion for B channel")
         B_output = B_solver.solve()
-        print("Solving Finished")
+        end_time = time.time()
+        print(f"Solving Finished, spend time: {end_time - start_time}")
         return np.stack((R_output, G_output, B_output), axis = 2)
+
+class TilingSolver(object):
+    def __init__(self, patch):
+        self.patch = patch
+        self.height, self.width, self.channels = patch.shape
+        print("height: " + (str)(self.height) )
+        print("width: " + (str)(self.width) )
+        assert(self.channels == 3), "Wrong number of chanels"
+        assert(self.height > 2 and self.width > 2), "Image too small"
+
+        self.source = self.patch
+        self.target = self.generate_target()
+
+        '''generate the mask'''
+        self.mask, self.mask_numpt = self.generate_mask()
+        print("mask_numpt: " + (str)(self.mask_numpt) )
+
+        '''preprocess the source'''
+        self.source_R = self.source[:,:,0]
+        self.source_G = self.source[:,:,1]
+        self.source_B = self.source[:,:,2]
+
+        '''preprocess the target'''
+        self.target_R = self.target[:,:,0]
+        self.target_G = self.target[:,:,1]
+        self.target_B = self.target[:,:,2]
+
+        '''gradient_h : (height - 1, width -1)'''
+        '''gradient_W : (height, width -1)'''
+        self.grad_source_R_h = self.grad(self.source_R, self.height, self.width, "h")
+        self.grad_source_R_w = self.grad(self.source_R, self.height, self.width, "w")
+        self.grad_source_G_h = self.grad(self.source_G, self.height, self.width, "h")
+        self.grad_source_G_w = self.grad(self.source_G, self.height, self.width, "w")
+        self.grad_source_B_h = self.grad(self.source_B, self.height, self.width, "h")
+        self.grad_source_B_w = self.grad(self.source_B, self.height, self.width, "w")
+
+        '''generate the guiding field'''
+        self.v_R_h = self.grad_source_R_h
+        self.v_R_w = self.grad_source_R_w
+        self.v_G_h = self.grad_source_G_h
+        self.v_G_w = self.grad_source_G_w
+        self.v_B_h = self.grad_source_B_h
+        self.v_B_w = self.grad_source_B_w
+
+    def generate_target(self):
+        target_ret = self.patch.copy()
+        target_ret[0,0] = (self.patch[0,0] * 2 + self.patch[0, self.width-1] + self.patch[self.height-1,0]) / 4
+        target_ret[0,self.width-1] = (self.patch[0,self.width-1] * 2 + self.patch[0, 0] + self.patch[self.height-1,self.width-1]) / 4
+        target_ret[self.height-1,0] = (self.patch[self.height-1,0] * 2 + self.patch[0, 0] + self.patch[self.height-1,self.width-1]) / 4
+        target_ret[self.height-1,self.width-1] = (self.patch[self.height-1,self.width-1] * 2 + self.patch[self.height-1, 0] + self.patch[0,self.width-1]) / 4
+        for i in range(1,self.height - 1):
+            mean = (self.patch[i, 0] + self.patch[i, self.width-1]) / 2
+            target_ret[i, 0] = mean
+            target_ret[i, self.width - 1] = mean
+        for j in range(1, self.width - 1):
+            mean = (self.patch[0, j] + self.patch[self.height-1,j]) / 2
+            target_ret[0, j] = mean
+            target_ret[self.height - 1, j] = mean
+        return target_ret
+
+    def generate_mask(self):
+        mask_ret = np.full((self.height, self.width), 0.5)
+        ind = 0
+        for i in range(1, self.height-1):
+            for j in range(1, self.width-1):
+                ind += 1
+                mask_ret[i,j] = ind
+        return mask_ret, ind
+    
+    def grad(self, M, height, width, axis):
+        if axis.lower() in {"w", "width", "wid"}:
+            grad_ret = np.zeros((width, height-1), dtype=float)
+            grad_ret = (M[:, 1:] - (M[:, :-1])) / 2
+            return grad_ret
+        elif  axis.lower() in {"h", "height"}:
+            grad_ret = np.zeros((width, height-1), dtype=float)
+            grad_ret = (M[1:, :] - (M[:-1, :])) / 2
+            return grad_ret
+        else:
+            return np.array([])
+    
+    def solve(self):
+        print("Start solving Tiling question")
+        start_time = time.time()
+        assert(isinstance(self.v_R_h, np.ndarray)), "v_R_h not a ndarray"
+        assert(isinstance(self.v_R_w, np.ndarray)), "v_R_w not a ndarray"
+        assert(isinstance(self.v_G_h, np.ndarray)), "v_G_h not a ndarray"
+        assert(isinstance(self.v_G_w, np.ndarray)), "v_G_w not a ndarray"
+        assert(isinstance(self.v_B_h, np.ndarray)), "v_B_h not a ndarray"
+        assert(isinstance(self.v_B_w, np.ndarray)), "v_B_w not a ndarray"
+
+        R_solver = GuidedInterpolationSolver(self.target_R, self.mask, self.mask_numpt, self.v_R_h, self.v_R_w, self.height, self.width)
+        G_solver = GuidedInterpolationSolver(self.target_G, self.mask, self.mask_numpt, self.v_G_h, self.v_G_w, self.height, self.width)
+        B_solver = GuidedInterpolationSolver(self.target_B, self.mask, self.mask_numpt, self.v_B_h, self.v_B_w, self.height, self.width)
+        print("Start solving GuidedInterpolationSolver subquestion for R channel")
+        R_output = R_solver.solve()
+        print("Start solving GuidedInterpolationSolver subquestion for G channel")
+        G_output = G_solver.solve()
+        print("Start solving GuidedInterpolationSolver subquestion for B channel")
+        B_output = B_solver.solve()
+        patch_p =  np.stack((R_output, G_output, B_output), axis = 2)
+        output_ret = np.zeros((self.height * 2, self.width * 2, 3), dtype=float)
+        output_ret[0:self.height, 0:self.width] = patch_p
+        output_ret[self.height:self.height*2, self.width:self.width*2] = patch_p
+        output_ret[0:self.height, self.width:self.width*2] = patch_p
+        output_ret[self.height:self.height*2, 0:self.width] = patch_p
+        output_ret = np.delete(output_ret, self.height, axis=0)
+        output_ret = np.delete(output_ret, self.width, axis=1)
+        end_time = time.time()
+        print(f"Solving Finished, spend time: {end_time - start_time}")
+        return np.clip(output_ret, 0, 255).astype(np.uint8)
 
 def str2bool(word):
     if isinstance(word, bool):
@@ -629,6 +747,11 @@ if __name__ == '__main__':
             G_mul = args.G_mul
             B_mul = args.B_mul
             solver = ColorChangeSolver(source, mask, R_mul, G_mul, B_mul)
+            output_img = solver.solve().astype(np.uint8)
+            cv2.imwrite(output_pth, output_img)
+            print("Output have been saved to " + output_pth)
+        elif (subtask == "tiling"):
+            solver = TilingSolver(source)
             output_img = solver.solve().astype(np.uint8)
             cv2.imwrite(output_pth, output_img)
             print("Output have been saved to " + output_pth)

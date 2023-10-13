@@ -1,4 +1,6 @@
 python poisson_tasks.py --task seamless_clone --source img/archive2/1/source.png --target img/archive2/1/target.png --mask img/archive2/1/mask.png --output img/archive2/1/output.png --mixing_gradients False
-python poisson_tasks.py --task selection_editing --subtask texture_flattening --source img/archive1/source_flat.jpg --mask img/archive1/mask_flat.jpg --output img/archive1/output_flat.jpg --flattening_threshold 50
+python poisson_tasks.py --task seamless_clone --source img/archive2/6/source.png --target img/archive2/6/target.png --mask img/archive2/6/mask.png --output img/archive2/6/output.png --mixing_gradients True
+python poisson_tasks.py --task selection_editing --subtask texture_flattening --source img/archive1/source_flat.jpg --mask img/archive1/mask_flat.jpg --output img/archive1/output_flat.jpg --flattening_threshold 1
 python poisson_tasks.py --task selection_editing --subtask illumination_change --source img/archive1/source_light.jpg --mask img/archive1/mask_light.jpg --output img/archive1/output_light.jpg
 python poisson_tasks.py --task selection_editing --subtask color_change --source img/ColorChange/source.jpg --mask img/ColorChange/mask.jpg --output img/ColorChange/output.jpg
+python poisson_tasks.py --task selection_editing --subtask tiling --source img/tiling.png --output img/tiling_output.png
